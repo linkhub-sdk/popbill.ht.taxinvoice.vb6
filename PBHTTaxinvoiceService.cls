@@ -125,10 +125,10 @@ Public Property Let IsTest(ByVal value As Boolean)
     m_IsTest = value
 End Property
 '초기화
-Public Sub Initialize(LinkID As String, SecretKey As String)
+Public Sub Initialize(linkID As String, SecretKey As String)
     Set m_Linkhub = New Linkhub
     
-    m_Linkhub.LinkID = LinkID
+    m_Linkhub.linkID = linkID
     m_Linkhub.SercetKey = SecretKey
     
     m_scope.Add "member"
@@ -452,11 +452,11 @@ ErrHandler:
     GetPopbillURL = ""
 End Function
 '회원가입 여부
-Public Function CheckIsMember(CorpNum As String, LinkID As String) As PBResponse
+Public Function CheckIsMember(CorpNum As String, linkID As String) As PBResponse
 On Error GoTo ErrHandler
     Dim result As Variant
     
-    Set result = httpGET("/Join?CorpNum=" + CorpNum + "&LID=" + LinkID, "")
+    Set result = httpGET("/Join?CorpNum=" + CorpNum + "&LID=" + linkID, "")
     
     Set CheckIsMember = New PBResponse
     CheckIsMember.code = result.Item("code")
@@ -477,7 +477,7 @@ On Error GoTo ErrHandler
     
     Set tmp = CreateObject("Scripting.Dictionary")
     
-    tmp.Add "LinkID", JoinInfo.LinkID
+    tmp.Add "LinkID", JoinInfo.linkID
     tmp.Add "CorpNum", JoinInfo.CorpNum
     tmp.Add "CorpName", JoinInfo.corpName
     tmp.Add "CEOName", JoinInfo.ceoname
@@ -564,10 +564,10 @@ End Function
 
 Public Function GetJobState(CorpNum As String, jobID As String) As PBHTTaxinvoiceJobState
 On Error GoTo ErrHandler
-    If jobID = "" Then
-        Err.Raise -99999999, "POPBILL", "작업아이디(jobID)가 입력되지 않았습니다."
+    If jobID = "" Or Not Len(jobID) = 18 Then
+        Err.Raise -99999999, "POPBILL", "작업아이디(jobID)가 올바르지 않습니다."
     End If
-    
+        
     Dim result As Variant
         
     Set result = httpGET("/HomeTax/Taxinvoice/" + jobID + "/State", getSession_token(CorpNum), "")
@@ -617,8 +617,8 @@ End Function
 Public Function Search(CorpNum As String, jobID As String, tiType As Collection, taxType As Collection, purposeType As Collection, taxRegIDType As String, taxRegID As Collection, taxRegIDYN As String, page As Integer, perPage As Integer, order As String) As PBHTTaxinvoiceSearch
 On Error GoTo ErrHandler
 
-    If jobID = "" Then
-        Err.Raise -99999999, "POPBILL", "작업아이디(jobID)가 입력되지 않았습니다."
+    If jobID = "" Or Not Len(jobID) = 18 Then
+        Err.Raise -99999999, "POPBILL", "작업아이디(jobID)가 올바르지 않습니다."
     End If
     
     Dim result As Variant
@@ -704,9 +704,11 @@ End Function
 Public Function Summary(CorpNum As String, jobID As String, tiType As Collection, taxType As Collection, purposeType As Collection, taxRegIDType As String, taxRegID As Collection, taxRegIDYN As String) As PBHTTaxinvoiceSummary
 On Error GoTo ErrHandler
 
-    If jobID = "" Then
-        Err.Raise -99999999, "POPBILL", "작업아이디(jobID)가 입력되지 않았습니다."
+    If jobID = "" Or Not Len(jobID) = 18 Then
+        Err.Raise -99999999, "POPBILL", "작업아이디(jobID)가 올바르지 않습니다."
     End If
+    
+    
     
     Dim result As Variant
     
@@ -785,14 +787,14 @@ End Function
 
 Public Function GetTaxinvoice(CorpNum As String, ntsconfirmNum As String) As PBHTTaxinvoice
 On Error GoTo ErrHandler
-    If ntsconfirmNum = "" Then
-        Err.Raise -99999999, "POPBILL", "국세청승인번호가 입력되지 않았습니다."
+    If ntsconfirmNum = "" Or Not Len(ntsconfirmNum) = 24 Then
+        Err.Raise -99999999, "POPBILL", "국세청승인번호가 올바르지 않았습니다."
     End If
     
     Dim result As Variant
-        
-    Set result = httpGET("/HomeTax/Taxinvoice/" + ntsconfirmNum, getSession_token(CorpNum), "")
     
+    Set result = httpGET("/HomeTax/Taxinvoice/" + ntsconfirmNum, getSession_token(CorpNum), "")
+        
     Set GetTaxinvoice = New PBHTTaxinvoice
         
     GetTaxinvoice.fromDictionary result
@@ -807,8 +809,8 @@ End Function
 
 Public Function GetXML(CorpNum As String, ntsconfirmNum As String) As PBHTTaxinvoiceXML
 On Error GoTo ErrHandler
-    If ntsconfirmNum = "" Then
-        Err.Raise -99999999, "POPBILL", "국세청승인번호가 입력되지 않았습니다."
+    If ntsconfirmNum = "" Or Not Len(ntsconfirmNum) = 24 Then
+        Err.Raise -99999999, "POPBILL", "국세청승인번호가 올바르지 않았습니다."
     End If
     
     Dim result As Variant
