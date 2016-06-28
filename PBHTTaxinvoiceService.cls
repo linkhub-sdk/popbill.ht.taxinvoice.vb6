@@ -564,7 +564,7 @@ End Function
 
 Public Function GetJobState(CorpNum As String, jobID As String) As PBHTTaxinvoiceJobState
 On Error GoTo ErrHandler
-    If jobID = "" Or Not Len(jobID) = 18 Then
+    If Not Len(jobID) = 18 Then
         Err.Raise -99999999, "POPBILL", "작업아이디(jobID)가 올바르지 않습니다."
     End If
         
@@ -617,7 +617,7 @@ End Function
 Public Function Search(CorpNum As String, jobID As String, tiType As Collection, taxType As Collection, purposeType As Collection, taxRegIDType As String, taxRegID As Collection, taxRegIDYN As String, page As Integer, perPage As Integer, order As String) As PBHTTaxinvoiceSearch
 On Error GoTo ErrHandler
 
-    If jobID = "" Or Not Len(jobID) = 18 Then
+    If Not Len(jobID) = 18 Then
         Err.Raise -99999999, "POPBILL", "작업아이디(jobID)가 올바르지 않습니다."
     End If
     
@@ -704,7 +704,7 @@ End Function
 Public Function Summary(CorpNum As String, jobID As String, tiType As Collection, taxType As Collection, purposeType As Collection, taxRegIDType As String, taxRegID As Collection, taxRegIDYN As String) As PBHTTaxinvoiceSummary
 On Error GoTo ErrHandler
 
-    If jobID = "" Or Not Len(jobID) = 18 Then
+    If Not Len(jobID) = 18 Then
         Err.Raise -99999999, "POPBILL", "작업아이디(jobID)가 올바르지 않습니다."
     End If
     
@@ -787,7 +787,7 @@ End Function
 
 Public Function GetTaxinvoice(CorpNum As String, ntsconfirmNum As String) As PBHTTaxinvoice
 On Error GoTo ErrHandler
-    If ntsconfirmNum = "" Or Not Len(ntsconfirmNum) = 24 Then
+    If Not Len(ntsconfirmNum) = 24 Then
         Err.Raise -99999999, "POPBILL", "국세청승인번호가 올바르지 않았습니다."
     End If
     
@@ -809,7 +809,7 @@ End Function
 
 Public Function GetXML(CorpNum As String, ntsconfirmNum As String) As PBHTTaxinvoiceXML
 On Error GoTo ErrHandler
-    If ntsconfirmNum = "" Or Not Len(ntsconfirmNum) = 24 Then
+    If Not Len(ntsconfirmNum) = 24 Then
         Err.Raise -99999999, "POPBILL", "국세청승인번호가 올바르지 않았습니다."
     End If
     
