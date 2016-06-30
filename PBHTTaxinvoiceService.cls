@@ -23,7 +23,7 @@ Option Explicit
 ' http://www.popbill.com
 ' Author : Jeong Yohan (code@linkhub.co.kr)
 ' Written : 2016-06-27
-' Updated : 2016-06-7
+' Updated : 2016-06-27
 '
 ' Thanks for your interest.
 '=================================================================================
@@ -526,11 +526,11 @@ ErrHandler:
     Set GetCorpInfo = Nothing
 End Function
 '과금정보 확인
-Public Function GetChargeInfo(CorpNum As String) As PBChargeInfo
+Public Function GetChargeInfo(CorpNum As String, Optional UserID As String) As PBChargeInfo
 On Error GoTo ErrHandler
     Dim result As Variant
        
-    Set result = httpGET("/HomeTax/Taxinvoice/ChargeInfo", getSession_token(CorpNum), "")
+    Set result = httpGET("/HomeTax/Taxinvoice/ChargeInfo", getSession_token(CorpNum), UserID)
     
     Set GetChargeInfo = New PBChargeInfo
         
@@ -544,7 +544,7 @@ ErrHandler:
 End Function
 
 '수집 요청
-Public Function RequestJob(CorpNum As String, tiType As KeyType, DType As String, SDate As String, EDate As String) As String
+Public Function RequestJob(CorpNum As String, tiType As KeyType, DType As String, SDate As String, EDate As String, Optional UserID As String) As String
 On Error GoTo ErrHandler
     Dim result As Variant
     
@@ -552,7 +552,7 @@ On Error GoTo ErrHandler
     
     strKeyType = IIf(tiType = TRUSTEE, "TRUSTEE", IIf(tiType = BUY, "BUY", "SELL"))
     
-    Set result = httpPOST("/HomeTax/Taxinvoice/" + strKeyType + "?DType=" + DType + "&SDate=" + SDate + "&EDate=" + EDate, getSession_token(CorpNum), "", "")
+    Set result = httpPOST("/HomeTax/Taxinvoice/" + strKeyType + "?DType=" + DType + "&SDate=" + SDate + "&EDate=" + EDate, getSession_token(CorpNum), "", UserID)
     
     RequestJob = result.Item("jobID")
     Exit Function
@@ -562,7 +562,7 @@ ErrHandler:
     RequestJob = ""
 End Function
 
-Public Function GetJobState(CorpNum As String, jobID As String) As PBHTTaxinvoiceJobState
+Public Function GetJobState(CorpNum As String, jobID As String, Optional UserID As String) As PBHTTaxinvoiceJobState
 On Error GoTo ErrHandler
     If Not Len(jobID) = 18 Then
         Err.Raise -99999999, "POPBILL", "작업아이디(jobID)가 올바르지 않습니다."
@@ -570,7 +570,7 @@ On Error GoTo ErrHandler
         
     Dim result As Variant
         
-    Set result = httpGET("/HomeTax/Taxinvoice/" + jobID + "/State", getSession_token(CorpNum), "")
+    Set result = httpGET("/HomeTax/Taxinvoice/" + jobID + "/State", getSession_token(CorpNum), UserID)
     
     Set GetJobState = New PBHTTaxinvoiceJobState
         
@@ -584,13 +584,12 @@ ErrHandler:
     Set GetJobState = Nothing
 End Function
 
-Public Function ListActiveJob(CorpNum As String) As Collection
+Public Function ListActiveJob(CorpNum As String, Optional UserID As String) As Collection
 On Error GoTo ErrHandler
    
     Dim result As Variant
     
-    Set result = httpGET("/HomeTax/Taxinvoice/JobList", _
-                                getSession_token(CorpNum), "")
+    Set result = httpGET("/HomeTax/Taxinvoice/JobList", getSession_token(CorpNum), UserID)
     
     Set ListActiveJob = New Collection
     
@@ -614,7 +613,7 @@ ErrHandler:
     Set ListActiveJob = Nothing
 End Function
 
-Public Function Search(CorpNum As String, jobID As String, tiType As Collection, taxType As Collection, purposeType As Collection, taxRegIDType As String, taxRegID As Collection, taxRegIDYN As String, page As Integer, perPage As Integer, order As String) As PBHTTaxinvoiceSearch
+Public Function Search(CorpNum As String, jobID As String, tiType As Collection, taxType As Collection, purposeType As Collection, taxRegIDType As String, taxRegID As String, taxRegIDYN As String, page As Integer, perPage As Integer, order As String, Optional UserID As String) As PBHTTaxinvoiceSearch
 On Error GoTo ErrHandler
 
     If Not Len(jobID) = 18 Then
@@ -665,17 +664,10 @@ On Error GoTo ErrHandler
        
     uri = uri + "&TaxRegIDType=" + taxRegIDType
     
-    If taxRegID.count > 0 Then
-        uri = uri + "&TaxRegID="
-        For i = 1 To taxRegID.count
-            If i <> taxRegID.count Then
-                uri = uri + taxRegID(i) + ","
-            Else
-                uri = uri + taxRegID(i)
-            End If
-        Next
+    If taxRegID <> "" Then
+        uri = uri + "&TaxRegID=" + taxRegID
     End If
-    
+       
     
     If taxRegIDYN <> "" Then
         uri = uri + "&TaxRegIDYN=" + taxRegIDYN
@@ -687,7 +679,7 @@ On Error GoTo ErrHandler
     uri = uri + "&PerPage=" + CStr(perPage)
     uri = uri + "&Order=" + order
     
-    Set result = httpGET(uri, getSession_token(CorpNum), "")
+    Set result = httpGET(uri, getSession_token(CorpNum), UserID)
     
     Set Search = New PBHTTaxinvoiceSearch
     
@@ -701,7 +693,7 @@ ErrHandler:
     Set Search = Nothing
 End Function
 
-Public Function Summary(CorpNum As String, jobID As String, tiType As Collection, taxType As Collection, purposeType As Collection, taxRegIDType As String, taxRegID As Collection, taxRegIDYN As String) As PBHTTaxinvoiceSummary
+Public Function Summary(CorpNum As String, jobID As String, tiType As Collection, taxType As Collection, purposeType As Collection, taxRegIDType As String, taxRegID As String, taxRegIDYN As String, Optional UserID As String) As PBHTTaxinvoiceSummary
 On Error GoTo ErrHandler
 
     If Not Len(jobID) = 18 Then
@@ -754,24 +746,16 @@ On Error GoTo ErrHandler
        
     uri = uri + "&TaxRegIDType=" + taxRegIDType
     
-    If taxRegID.count > 0 Then
-        uri = uri + "&TaxRegID="
-        For i = 1 To taxRegID.count
-            If i <> taxRegID.count Then
-                uri = uri + taxRegID(i) + ","
-            Else
-                uri = uri + taxRegID(i)
-            End If
-        Next
+    If taxRegID <> "" Then
+        uri = uri + "&TaxRegID=" + taxRegID
     End If
-    
-    
+        
     If taxRegIDYN <> "" Then
         uri = uri + "&TaxRegIDYN=" + taxRegIDYN
     End If
     
         
-    Set result = httpGET(uri, getSession_token(CorpNum), "")
+    Set result = httpGET(uri, getSession_token(CorpNum), UserID)
     
     Set Summary = New PBHTTaxinvoiceSummary
     
@@ -785,7 +769,7 @@ ErrHandler:
     Set Summary = Nothing
 End Function
 
-Public Function GetTaxinvoice(CorpNum As String, ntsconfirmNum As String) As PBHTTaxinvoice
+Public Function GetTaxinvoice(CorpNum As String, ntsconfirmNum As String, Optional UserID As String) As PBHTTaxinvoice
 On Error GoTo ErrHandler
     If Not Len(ntsconfirmNum) = 24 Then
         Err.Raise -99999999, "POPBILL", "국세청승인번호가 올바르지 않았습니다."
@@ -793,7 +777,7 @@ On Error GoTo ErrHandler
     
     Dim result As Variant
     
-    Set result = httpGET("/HomeTax/Taxinvoice/" + ntsconfirmNum, getSession_token(CorpNum), "")
+    Set result = httpGET("/HomeTax/Taxinvoice/" + ntsconfirmNum, getSession_token(CorpNum), UserID)
         
     Set GetTaxinvoice = New PBHTTaxinvoice
         
@@ -807,7 +791,7 @@ ErrHandler:
     Set GetTaxinvoice = Nothing
 End Function
 
-Public Function GetXML(CorpNum As String, ntsconfirmNum As String) As PBHTTaxinvoiceXML
+Public Function GetXML(CorpNum As String, ntsconfirmNum As String, Optional UserID As String) As PBHTTaxinvoiceXML
 On Error GoTo ErrHandler
     If Not Len(ntsconfirmNum) = 24 Then
         Err.Raise -99999999, "POPBILL", "국세청승인번호가 올바르지 않았습니다."
@@ -815,7 +799,7 @@ On Error GoTo ErrHandler
     
     Dim result As Variant
         
-    Set result = httpGET("/HomeTax/Taxinvoice/" + ntsconfirmNum + "?T=xml", getSession_token(CorpNum), "")
+    Set result = httpGET("/HomeTax/Taxinvoice/" + ntsconfirmNum + "?T=xml", getSession_token(CorpNum), UserID)
     
     Set GetXML = New PBHTTaxinvoiceXML
         
@@ -857,12 +841,12 @@ ErrHandler:
     GetCertificatePopUpURL = ""
 End Function
 
-Public Function GetFlatRateState(CorpNum As String) As PBHTTaxinvoiceFlatRate
+Public Function GetFlatRateState(CorpNum As String, Optional UserID As String) As PBHTTaxinvoiceFlatRate
 On Error GoTo ErrHandler
         
     Dim result As Variant
         
-    Set result = httpGET("/HomeTax/Taxinvoice/Contract", getSession_token(CorpNum), "")
+    Set result = httpGET("/HomeTax/Taxinvoice/Contract", getSession_token(CorpNum), UserID)
     
     Set GetFlatRateState = New PBHTTaxinvoiceFlatRate
         
@@ -876,11 +860,11 @@ ErrHandler:
     Set GetFlatRateState = Nothing
 End Function
 
-Public Function GetCertificateExpireDate(CorpNum As String) As String
+Public Function GetCertificateExpireDate(CorpNum As String, Optional UserID As String) As String
 On Error GoTo ErrHandler
     Dim result As Variant
     
-    Set result = httpGET("/HomeTax/Taxinvoice/CertInfo", getSession_token(CorpNum), "")
+    Set result = httpGET("/HomeTax/Taxinvoice/CertInfo", getSession_token(CorpNum), UserID)
     
     GetCertificateExpireDate = result.Item("certificateExpiration")
     Exit Function
