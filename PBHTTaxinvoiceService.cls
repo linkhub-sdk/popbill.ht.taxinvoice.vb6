@@ -23,7 +23,7 @@ Option Explicit
 ' http://www.popbill.com
 ' Author : Jeong Yohan (code@linkhub.co.kr)
 ' Written : 2016-06-27
-' Updated : 2017-02-23
+' Updated : 2017-05-24
 '
 ' Thanks for your interest.
 '=================================================================================
@@ -359,6 +359,7 @@ On Error GoTo ErrHandler
     
     Set tmp = CreateObject("Scripting.Dictionary")
     
+    tmp.Add "id", ContactInfo.id
     tmp.Add "personName", ContactInfo.personName
     tmp.Add "tel", ContactInfo.tel
     tmp.Add "hp", ContactInfo.hp
