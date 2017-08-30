@@ -56,6 +56,9 @@ Public trusteeCorpName  As String   '수탁자상호
 Public trusteeCEOName   As String   '수탁자 대표자성명
 Public trusteeEmail     As String   '수탁자 담당자 이메일
 
+Public invoiceType      As String   '매출/매입 구분 - 2017/08/30 추가
+
+
 Public Sub fromDictionary(dic As Variant)
 
     ntsconfirmNum = dic.Item("ntsconfirmNum")
@@ -101,6 +104,8 @@ Public Sub fromDictionary(dic As Variant)
     trusteeCorpName = dic.Item("trusteeCorpName")
     trusteeCEOName = dic.Item("trusteeCEOName")
     trusteeEmail = dic.Item("trusteeEmail")
+    
+    invoiceType = dic.Item("invoiceType")
     
   
 End Sub
