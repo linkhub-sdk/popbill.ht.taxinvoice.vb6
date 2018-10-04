@@ -911,3 +911,101 @@ ErrHandler:
 End Function
 
 
+'홈택스 공인인증서 로그인 테스트
+Public Function CheckCertValidation(CorpNum As String, Optional UserID As String = "") As PBResponse
+On Error GoTo ErrHandler
+    Dim result As Variant
+    
+    Set result = httpGET("/HomeTax/Taxinvoice/CertCheck", getSession_token(CorpNum), UserID)
+    
+    Set CheckCertValidation = New PBResponse
+    CheckCertValidation.code = result.Item("code")
+    CheckCertValidation.Message = result.Item("message")
+    Exit Function
+ErrHandler:
+    m_LastErrCode = Err.Number
+    m_LastErrMessage = Err.Description
+    Set CheckCertValidation = Nothing
+End Function
+
+'부서사용자 계정등록
+Public Function RegistDeptUser(CorpNum As String, DeptUserID As String, DeptUserPWD As String, Optional UserID As String = "") As PBResponse
+On Error GoTo ErrHandler
+    Set RegistDeptUser = Nothing
+    
+    Dim postdata As String
+    Dim tmp
+    
+    Set tmp = CreateObject("Scripting.Dictionary")
+    
+    tmp.Add "id", DeptUserID
+    tmp.Add "pwd", DeptUserPWD
+            
+    postdata = m_Linkhub.toString(tmp)
+    
+    Dim result As Variant
+    
+    Set result = httpPOST("/HomeTax/Taxinvoice/DeptUser", getSession_token(CorpNum), postdata, UserID)
+    
+    Set RegistDeptUser = New PBResponse
+    
+    RegistDeptUser.code = result.Item("code")
+    RegistDeptUser.Message = result.Item("message")
+    Exit Function
+ErrHandler:
+    m_LastErrCode = Err.Number
+    m_LastErrMessage = Err.Description
+End Function
+
+'부서사용자 등록정보 확인
+Public Function CheckDeptUser(CorpNum As String, Optional UserID As String = "") As PBResponse
+On Error GoTo ErrHandler
+    Dim result As Variant
+    
+    Set result = httpGET("/HomeTax/Taxinvoice/DeptUser", getSession_token(CorpNum), UserID)
+    
+    Set CheckDeptUser = New PBResponse
+    CheckDeptUser.code = result.Item("code")
+    CheckDeptUser.Message = result.Item("message")
+    Exit Function
+ErrHandler:
+    m_LastErrCode = Err.Number
+    m_LastErrMessage = Err.Description
+    Set CheckDeptUser = Nothing
+End Function
+
+'부서사용자 로그인 테스트
+Public Function CheckLoginDeptUser(CorpNum As String, Optional UserID As String = "") As PBResponse
+On Error GoTo ErrHandler
+    Dim result As Variant
+    
+    Set result = httpGET("/HomeTax/Taxinvoice/DeptUser/Check", getSession_token(CorpNum), UserID)
+    
+    Set CheckLoginDeptUser = New PBResponse
+    CheckLoginDeptUser.code = result.Item("code")
+    CheckLoginDeptUser.Message = result.Item("message")
+    Exit Function
+ErrHandler:
+    m_LastErrCode = Err.Number
+    m_LastErrMessage = Err.Description
+    Set CheckLoginDeptUser = Nothing
+End Function
+
+'부서사용자 등록정보 삭제
+Public Function DeleteDeptUser(CorpNum As String, Optional UserID As String = "") As PBResponse
+On Error GoTo ErrHandler
+    Set DeleteDeptUser = Nothing
+    
+    Dim result As Variant
+    
+    Set result = httpPOST_override("/HomeTax/Taxinvoice/DeptUser", getSession_token(CorpNum), "DELETE", "", UserID)
+    Set DeleteDeptUser = New PBResponse
+    
+    DeleteDeptUser.code = result.Item("code")
+    DeleteDeptUser.Message = result.Item("message")
+    Exit Function
+ErrHandler:
+    m_LastErrCode = Err.Number
+    m_LastErrMessage = Err.Description
+    Set DeleteDeptUser = Nothing
+End Function
