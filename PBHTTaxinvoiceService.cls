@@ -24,6 +24,8 @@ Option Explicit
 ' Author : Jeong Yohan (code@linkhub.co.kr)
 ' Written : 2016-06-27
 ' Updated : 2017-08-30
+' Contributor : Kim EunHye (code@linkhub.co.kr)
+' Updated : 2018-10-04
 '
 ' Thanks for your interest.
 '=================================================================================
@@ -888,4 +890,24 @@ ErrHandler:
     m_LastErrMessage = Err.Description
     GetCertificateExpireDate = ""
 End Function
+
+'홈택스 전자세금계산서 보기 팝업 URL
+Public Function GetPopUpURL(CorpNum As String, ntsconfirmNum As String, Optional UserID As String = "") As String
+On Error GoTo ErrHandler
+    If Not Len(ntsconfirmNum) = 24 Then
+        Err.Raise -99999999, "POPBILL", "국세청승인번호가 올바르지 않았습니다."
+    End If
+
+    Dim result As Variant
+    
+    Set result = httpGET("/HomeTax/Taxinvoice/" + ntsconfirmNum + "/PopUp", getSession_token(CorpNum), UserID)
+    
+    GetPopUpURL = result.Item("url")
+    Exit Function
+ErrHandler:
+    m_LastErrCode = Err.Number
+    m_LastErrMessage = Err.Description
+    GetPopUpURL = ""
+End Function
+
 
