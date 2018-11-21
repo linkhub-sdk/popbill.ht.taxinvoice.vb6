@@ -472,6 +472,36 @@ ErrHandler:
     m_LastErrMessage = Err.Description
     GetPopbillURL = ""
 End Function
+'팝빌 로그인 기본 URL
+Public Function GetAccessURL(CorpNum As String, UserID As String) As String
+On Error GoTo ErrHandler
+   Dim result As Variant
+   
+   Set result = httpGET("/?TG=LOGIN", getSession_token(CorpNum), UserID)
+   
+   GetAccessURL = result.Item("url")
+   Exit Function
+ErrHandler:
+   m_LastErrCode = Err.Number
+   m_LastErrMessage = Err.Description
+   GetAccessURL = ""
+End Function
+
+'팝빌 연동회원 포인트 충전 URL
+Public Function GetChargeURL(CorpNum As String, UserID As String) As String
+On Error GoTo ErrHandler
+   Dim result As Variant
+   
+   Set result = httpGET("/?TG=CHRG", getSession_token(CorpNum), UserID)
+   
+   GetChargeURL = result.Item("url")
+   Exit Function
+ErrHandler:
+   m_LastErrCode = Err.Number
+   m_LastErrMessage = Err.Description
+   GetChargeURL = ""
+End Function
+
 '회원가입 여부
 Public Function CheckIsMember(CorpNum As String, LinkID As String) As PBResponse
 On Error GoTo ErrHandler
