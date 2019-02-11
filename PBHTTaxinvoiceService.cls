@@ -444,11 +444,11 @@ ErrHandler:
     GetPartnerBalance = m_LastErrCode
 End Function
 
-'파트너 포인트 충전 URL - 2017/08/30 추가
+'파트너 포인트 충전 URL
 Public Function GetPartnerURL(CorpNum As String, TOGO As String) As String
     On Error GoTo ErrHandler
     
-    GetParnterURL = m_Linkhub.GetPartnerURL(getSession_token(CorpNum), IIf(m_IsTest, ServiceID_TEST, ServiceID_REAL), TOGO)
+    GetPartnerURL = m_Linkhub.GetPartnerURL(getSession_token(CorpNum), IIf(m_IsTest, ServiceID_TEST, ServiceID_REAL), TOGO)
     
     Exit Function
 ErrHandler:
@@ -456,6 +456,7 @@ ErrHandler:
     m_LastErrMessage = Err.Description
     GetPartnerURL = m_LastErrCode
 End Function
+
 
 '팝빌 기본 URL
 Public Function GetPopbillURL(CorpNum As String, UserID As String, TOGO As String) As String
