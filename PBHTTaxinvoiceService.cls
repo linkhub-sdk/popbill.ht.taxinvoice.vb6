@@ -33,6 +33,11 @@ Private Const ServiceURL_REAL = "https://popbill.linkhub.co.kr"
 Private Const ServiceURL_TEST = "https://popbill-test.linkhub.co.kr"
 Private Const APIVersion = "1.0"
 
+
+Private Const adTypeBinary As Long = 1
+Private Const adTypeText As Long = 2
+Private Const adModeReadWrite As Long = 3
+
 Private m_IsTest As Boolean
 Private m_IPRestrictOnOff As Boolean
 Private m_Linkhub As Linkhub
@@ -677,7 +682,7 @@ ErrHandler:
     Set ListActiveJob = Nothing
 End Function
 
-Public Function Search(CorpNum As String, jobID As String, tiType As Collection, taxType As Collection, purposeType As Collection, taxRegIDType As String, taxRegID As String, taxRegIDYN As String, page As Integer, perPage As Integer, order As String, Optional UserID As String = "") As PBHTTaxinvoiceSearch
+Public Function Search(CorpNum As String, jobID As String, tiType As Collection, taxType As Collection, purposeType As Collection, taxRegIDType As String, taxRegID As String, taxRegIDYN As String, page As Integer, perPage As Integer, order As String, Optional UserID As String = "", Optional SearchString As String = "") As PBHTTaxinvoiceSearch
 On Error GoTo ErrHandler
 
     If Not Len(jobID) = 18 Then
@@ -737,6 +742,10 @@ On Error GoTo ErrHandler
         uri = uri + "&TaxRegIDYN=" + taxRegIDYN
     End If
     
+    If SearchString <> "" Then
+        uri = uri + "&SearchString=" + URLEncode(SearchString)
+    End If
+    
     page = IIf(page < 1, 1, page)
     perPage = IIf(perPage < 1, 500, perPage)
     uri = uri + "&Page=" + CStr(page)
@@ -757,7 +766,7 @@ ErrHandler:
     Set Search = Nothing
 End Function
 
-Public Function Summary(CorpNum As String, jobID As String, tiType As Collection, taxType As Collection, purposeType As Collection, taxRegIDType As String, taxRegID As String, taxRegIDYN As String, Optional UserID As String = "") As PBHTTaxinvoiceSummary
+Public Function Summary(CorpNum As String, jobID As String, tiType As Collection, taxType As Collection, purposeType As Collection, taxRegIDType As String, taxRegID As String, taxRegIDYN As String, Optional UserID As String = "", Optional SearchString As String = "") As PBHTTaxinvoiceSummary
 On Error GoTo ErrHandler
 
     If Not Len(jobID) = 18 Then
@@ -816,6 +825,10 @@ On Error GoTo ErrHandler
         
     If taxRegIDYN <> "" Then
         uri = uri + "&TaxRegIDYN=" + taxRegIDYN
+    End If
+    
+    If SearchString <> "" Then
+        uri = uri + "&SearchString=" + URLEncode(SearchString)
     End If
     
         
@@ -1073,4 +1086,52 @@ ErrHandler:
     m_LastErrCode = Err.Number
     m_LastErrMessage = Err.Description
     Set DeleteDeptUser = Nothing
+End Function
+
+
+Private Function URLEncode(ByVal StringToEncode As String) As String
+   Dim i                As Integer
+   Dim iAsc             As Long
+   Dim sTemp            As String
+   
+   Dim ByteArrayToEncode() As Byte
+ 
+   ByteArrayToEncode = ADO_EncodeUTF8(StringToEncode)
+   
+   For i = 0 To UBound(ByteArrayToEncode)
+      iAsc = ByteArrayToEncode(i)
+      Select Case iAsc
+         Case 32 'space
+            sTemp = "+"
+         Case 48 To 57, 65 To 90, 97 To 122
+            sTemp = Chr(ByteArrayToEncode(i))
+         Case Else
+            Debug.Print iAsc
+            sTemp = "%" & Hex(iAsc)
+      End Select
+      URLEncode = URLEncode & sTemp
+   Next
+ 
+End Function
+  
+'Purpose: UTF16 to UTF8 using ADO
+Private Function ADO_EncodeUTF8(ByVal strUTF16 As String) As Byte()
+ 
+   Dim objStream        As Object
+   Dim Data()           As Byte
+ 
+   Set objStream = CreateObject("ADODB.Stream")
+   objStream.Charset = "utf-8"
+   objStream.Mode = adModeReadWrite
+   objStream.Type = adTypeText
+   objStream.Open
+   objStream.WriteText strUTF16
+   objStream.Flush
+   objStream.Position = 0
+   objStream.Type = adTypeBinary
+   objStream.Read 3 ' skip BOM
+   Data = objStream.Read()
+   objStream.Close
+   ADO_EncodeUTF8 = Data
+ 
 End Function
