@@ -23,7 +23,7 @@ Option Explicit
 ' http://www.popbill.com
 ' Author : Jeong Yohan (code@linkhub.co.kr)
 ' Written : 2016-06-27
-' Updated : 2019-09-26
+' Updated : 2019-12-02
 '
 ' Thanks for your interest.
 '=================================================================================
@@ -957,6 +957,24 @@ ErrHandler:
     GetPopUpURL = ""
 End Function
 
+
+Public Function GetPrintURL(CorpNum As String, ntsconfirmNum As String, Optional UserID As String = "") As String
+On Error GoTo ErrHandler
+    If Not Len(ntsconfirmNum) = 24 Then
+        Err.Raise -99999999, "POPBILL", "국세청승인번호가 올바르지 않았습니다."
+    End If
+
+    Dim result As Variant
+    
+    Set result = httpGET("/HomeTax/Taxinvoice/" + ntsconfirmNum + "/Print", getSession_token(CorpNum), UserID)
+    
+    GetPrintURL = result.Item("url")
+    Exit Function
+ErrHandler:
+    m_LastErrCode = Err.Number
+    m_LastErrMessage = Err.Description
+    GetPrintURL = ""
+End Function
 
 '홈택스 공인인증서 로그인 테스트
 Public Function CheckCertValidation(CorpNum As String, Optional UserID As String = "") As PBResponse
