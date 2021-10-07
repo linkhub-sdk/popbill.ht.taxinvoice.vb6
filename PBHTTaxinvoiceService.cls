@@ -23,7 +23,7 @@ Option Explicit
 ' http://www.popbill.com
 ' Author : Jeong Yohan (code@linkhub.co.kr)
 ' Written : 2016-06-27
-' Updated : 2019-12-02
+' Updated : 2021-10-07
 '
 ' Thanks for your interest.
 '=================================================================================
@@ -46,6 +46,7 @@ Private m_IsTest As Boolean
 Private m_IPRestrictOnOff As Boolean
 Private m_UseStaticIP As Boolean
 Private m_UseGAIP As Boolean
+Private m_UseLocalTimeYN As Boolean
 Private m_Linkhub As Linkhub
 Private m_scope As New Collection
 Private m_LastErrCode As Long
@@ -149,6 +150,10 @@ Public Property Let UseGAIP(ByVal value As Boolean)
     m_UseGAIP = value
 End Property
 
+Public Property Let UseLocalTimeYN(ByVal value As Boolean)
+    m_UseLocalTimeYN = value
+End Property
+
 '√ ±‚»≠
 Public Sub Initialize(LinkID As String, SecretKey As String)
     Set m_Linkhub = New Linkhub
@@ -165,6 +170,7 @@ Public Sub Initialize(LinkID As String, SecretKey As String)
     m_IPRestrictOnOff = True
     m_UseStaticIP = False
     m_UseGAIP = False
+    m_UseLocalTimeYN = False
 End Sub
 
 Private Function getTargetURL() As String
@@ -193,13 +199,13 @@ Private Function getSession_token(CorpNum As String) As String
         refresh = True
     Else
         Dim utcnow As String
-        utcnow = m_Linkhub.GetTime(m_UseStaticIP, m_UseGAIP)
+        utcnow = m_Linkhub.GetTime(m_UseStaticIP, m_UseGAIP, m_UseLocalTimeYN)
         refresh = m_Token.expiration < utcnow
     End If
     
     If refresh Then
     
-        Set m_Token = m_Linkhub.getToken(IIf(m_IsTest, ServiceID_TEST, ServiceID_REAL), CorpNum, m_scope, IIf(m_IPRestrictOnOff, "", "*"), m_UseStaticIP, m_UseGAIP)
+        Set m_Token = m_Linkhub.getToken(IIf(m_IsTest, ServiceID_TEST, ServiceID_REAL), CorpNum, m_scope, IIf(m_IPRestrictOnOff, "", "*"), m_UseStaticIP, m_UseGAIP, m_UseLocalTimeYN)
         
         If m_Token Is Nothing Then
             Err.Raise m_Linkhub.LastErrCode, "POPBILL", m_Linkhub.LastErrMessage
