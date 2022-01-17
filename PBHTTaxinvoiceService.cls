@@ -21,9 +21,9 @@ Option Explicit
 ' on system32 by default.
 '
 ' http://www.popbill.com
-' Author : Jeong Yohan (code@linkhub.co.kr)
+' Author : Jeong Yohan (code@linkhubcorp.com)
 ' Written : 2016-06-27
-' Updated : 2021-10-18
+' Updated : 2022-01-17
 '
 ' Thanks for your interest.
 '=================================================================================
@@ -1083,7 +1083,7 @@ ErrHandler:
     GetPrintURL = ""
 End Function
 
-'홈택스 공인인증서 로그인 테스트
+'홈택스 공동인증서 로그인 테스트
 Public Function CheckCertValidation(CorpNum As String, Optional UserID As String = "") As PBResponse
 On Error GoTo ErrHandler
     Dim result As Variant
